@@ -14,15 +14,17 @@ interface StockApi
 
     fun buy(stockName: String, amount: Int): Transaction
 
-    fun transfer(fromName: String, toName: String): Transaction  = {
+    fun transfer(fromName: String, toName: String): Transaction =
 
-        portfolio ->
+            get(fromName)
+                    .flatMap { sell(fromName, it) }
+                    .flatMap { buy(toName, it) }
 
-        val quantity = get(fromName)(portfolio).amount
-        val (revenues, portfolio1) = sell(fromName, quantity)(portfolio)
-        val (quantityPurchased, portfolio2) = buy(toName, revenues)(portfolio1)
 
-        TransactionResult(quantityPurchased,portfolio2)
+
+    infix fun Transaction.flatMap(f: (Int) -> (Transaction)): Transaction = { portfolio ->
+        val (amount, newPortfolio) = this(portfolio)
+        f(amount)(newPortfolio)
     }
 
 }
