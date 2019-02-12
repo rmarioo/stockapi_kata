@@ -42,7 +42,7 @@ class StockApiTest {
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
-        val transactionResult = stockApi.move(
+        val transactionResult = stockApi.transfer(
                 fromName  = "GE",
                 toName    = "FIAT",
                 portfolio = Portfolio(mapOf("GE" to 50,"FIAT" to 100)))

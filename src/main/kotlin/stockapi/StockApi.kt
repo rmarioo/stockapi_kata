@@ -12,7 +12,7 @@ interface StockApi
 
     fun buy(stockName: String, amount: Int, portfolio: Portfolio): TransactionResult
 
-    fun move(fromName: String,toName: String,portfolio: Portfolio ): TransactionResult {
+    fun transfer(fromName: String, toName: String, portfolio: Portfolio ): TransactionResult {
 
         val quantity = get(fromName,portfolio)
         val (revenues, portfolio1) = sell(fromName, quantity, portfolio)
