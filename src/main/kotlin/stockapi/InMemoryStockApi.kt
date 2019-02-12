@@ -25,8 +25,8 @@ class InMemoryStockApi(val prizes: Map<String, Int>) : StockApi
 
     }
 
-    override fun get(stockName: String, portfolio: Portfolio): Int {
-        return portfolio.map.getValue(stockName)
+    override fun get(stockName: String, portfolio: Portfolio): TransactionResult {
+        return TransactionResult(portfolio.map.getValue(stockName),portfolio)
     }
 
 }

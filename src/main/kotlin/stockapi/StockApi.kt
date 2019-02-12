@@ -6,7 +6,7 @@ data class TransactionResult(val amount: Int, val portfolio: Portfolio)
 
 interface StockApi
 {
-    fun get(stockName: String, portfolio: Portfolio): Int
+    fun get(stockName: String, portfolio: Portfolio): TransactionResult
 
     fun sell(stockName: String, quantity: Int, portfolio: Portfolio): TransactionResult
 
@@ -14,7 +14,7 @@ interface StockApi
 
     fun transfer(fromName: String, toName: String, portfolio: Portfolio ): TransactionResult {
 
-        val quantity = get(fromName,portfolio)
+        val quantity = get(fromName,portfolio).amount
         val (revenues, portfolio1) = sell(fromName, quantity, portfolio)
         val (quantityPurchased, portfolio2) = buy(toName, revenues, portfolio1)
 
