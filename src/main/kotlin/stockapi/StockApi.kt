@@ -4,21 +4,25 @@ data class Portfolio(val map: Map<String, Int>)
 
 data class TransactionResult(val amount: Int, val portfolio: Portfolio)
 
+typealias Transaction = (Portfolio) -> TransactionResult
+
 interface StockApi
 {
-    fun get(stockName: String, portfolio: Portfolio): TransactionResult
+    fun get(stockName: String): Transaction
 
-    fun sell(stockName: String, quantity: Int, portfolio: Portfolio): TransactionResult
+    fun sell(stockName: String, quantity: Int): Transaction
 
-    fun buy(stockName: String, amount: Int, portfolio: Portfolio): TransactionResult
+    fun buy(stockName: String, amount: Int): Transaction
 
-    fun transfer(fromName: String, toName: String, portfolio: Portfolio ): TransactionResult {
+    fun transfer(fromName: String, toName: String): Transaction  = {
 
-        val quantity = get(fromName,portfolio).amount
-        val (revenues, portfolio1) = sell(fromName, quantity, portfolio)
-        val (quantityPurchased, portfolio2) = buy(toName, revenues, portfolio1)
+        portfolio ->
 
-        return TransactionResult(quantityPurchased,portfolio2)
+        val quantity = get(fromName)(portfolio).amount
+        val (revenues, portfolio1) = sell(fromName, quantity)(portfolio)
+        val (quantityPurchased, portfolio2) = buy(toName, revenues)(portfolio1)
+
+        TransactionResult(quantityPurchased,portfolio2)
     }
 
 }

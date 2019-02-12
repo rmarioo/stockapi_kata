@@ -12,9 +12,9 @@ class StockApiTest {
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
+        val portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100))
         val transactionResult = stockApi.sell(  stockName = "GE",
-                                                quantity  = 10,
-                                                portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100)))
+                                                quantity  = 10)(portfolio)
 
         assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 40, "FIAT" to 100))))
         assertThat(transactionResult.amount, `is`(10*10))
@@ -26,10 +26,10 @@ class StockApiTest {
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
+        val portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100))
         val transactionResult = stockApi.buy(
                 stockName  = "GE",
-                amount = 50,
-                portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100)))
+                amount = 50)(portfolio)
 
         assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 50+(50/10), "FIAT"  to 100))))
         assertThat(transactionResult.amount, `is`(50/10))
@@ -42,10 +42,10 @@ class StockApiTest {
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
+        val portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100))
         val transactionResult = stockApi.transfer(
                 fromName  = "GE",
-                toName    = "FIAT",
-                portfolio = Portfolio(mapOf("GE" to 50,"FIAT" to 100)))
+                toName    = "FIAT")(portfolio)
 
         assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
         assertThat(transactionResult.amount, `is`(250))

@@ -3,30 +3,33 @@ package stockapi
 class InMemoryStockApi(val prizes: Map<String, Int>) : StockApi
 {
 
-    override fun buy(stockName: String, amount: Int, portfolio: Portfolio): TransactionResult {
+    override fun buy(stockName: String, amount: Int): Transaction  ={
 
+        portfolio ->
         val numberPurchased = amount / prizes.getValue(stockName)
 
         val toMutableMap = portfolio.map.toMutableMap()
         toMutableMap.put(stockName,portfolio.map.getValue(stockName) + numberPurchased)
 
-        return TransactionResult(numberPurchased, Portfolio(toMutableMap))
+        TransactionResult(numberPurchased, Portfolio(toMutableMap))
 
     }
 
-    override fun sell(stockName: String, quantity: Int, portfolio: Portfolio): TransactionResult {
+    override fun sell(stockName: String, quantity: Int): Transaction = {
 
+        portfolio ->
         val revenues = quantity * prizes.getValue(stockName)
 
         val toMutableMap = portfolio.map.toMutableMap()
         toMutableMap.put(stockName,portfolio.map.getValue(stockName) -  quantity)
 
-        return TransactionResult(revenues, Portfolio(toMutableMap))
+        TransactionResult(revenues, Portfolio(toMutableMap))
 
     }
 
-    override fun get(stockName: String, portfolio: Portfolio): TransactionResult {
-        return TransactionResult(portfolio.map.getValue(stockName),portfolio)
+    override fun get(stockName: String ): Transaction = {
+        portfolio ->
+        TransactionResult(portfolio.map.getValue(stockName),portfolio)
     }
 
 }
