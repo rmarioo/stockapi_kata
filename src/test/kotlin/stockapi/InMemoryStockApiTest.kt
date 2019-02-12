@@ -36,7 +36,7 @@ class StockApiTest {
     }
 
 
-/*  @Test
+  @Test
     fun `transfer stocks v1`() {
 
 
@@ -50,5 +50,4 @@ class StockApiTest {
         assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
         assertThat(transactionResult.amount, `is`(250))
     }
-    */
 }
