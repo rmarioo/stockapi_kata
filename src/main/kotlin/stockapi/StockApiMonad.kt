@@ -16,7 +16,7 @@ interface StockApiMonad
 
         val actualQuantity = get(fromName).bind()
         val revenues = sell(fromName, actualQuantity).bind()
-        val purchase = buy(toName, revenues)
+        val purchase = buy(toName, revenues).bind()
         purchase
     }
 
