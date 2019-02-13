@@ -1,5 +1,6 @@
 package stockapi
 
+import arrow.data.fix
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -49,5 +50,18 @@ class StockApiTest {
 
         assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
         assertThat(transactionResult.amount, `is`(250))
+    }
+
+    @Test
+    fun `transfer stocks  monad`() {
+
+
+        val stockApi: StockApiMonad = InMemoryStockApiMonad(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
+
+        val program = stockApi.transfer(fromName = "GE", toName = "FIAT")
+
+        val portfolio: Portfolio = program.fix().run { Portfolio(mapOf("GE" to 50, "FIAT" to 100)) }
+
+        assertThat(portfolio, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
     }
 }
