@@ -1,35 +1,34 @@
 package stockapi
 
-class InMemoryStockApi(val prizes: Map<String, Int>) : StockApi
-{
+import arrow.core.Tuple2
+import arrow.data.State
 
-    override fun buy(stockName: String, amount: Int): Transaction  ={
+class InMemoryStockApi(val prizes: Map<String, Int>) : StockApi {
 
-        portfolio ->
-        val numberPurchased = amount / prizes.getValue(stockName)
+    override fun buy(stockName: String, amount: Int): State<Portfolio, Int> =
 
-        val toMutableMap = portfolio.map.toMutableMap()
-        toMutableMap.put(stockName,portfolio.map.getValue(stockName) + numberPurchased)
+            State { portfolio ->
+                val numberPurchased = amount / prizes.getValue(stockName)
 
-        TransactionResult(numberPurchased, Portfolio(toMutableMap))
+                val toMutableMap = portfolio.map.toMutableMap()
+                toMutableMap.put(stockName, portfolio.map.getValue(stockName) + numberPurchased)
 
-    }
+                Tuple2(Portfolio(toMutableMap), numberPurchased)
 
-    override fun sell(stockName: String, quantity: Int): Transaction = {
+            }
 
-        portfolio ->
-        val revenues = quantity * prizes.getValue(stockName)
+    override fun sell(stockName: String, quantity: Int): State<Portfolio, Int> =
 
-        val toMutableMap = portfolio.map.toMutableMap()
-        toMutableMap.put(stockName,portfolio.map.getValue(stockName) -  quantity)
+            State { portfolio ->
 
-        TransactionResult(revenues, Portfolio(toMutableMap))
+                val revenues = quantity * prizes.getValue(stockName)
+                val toMutableMap = portfolio.map.toMutableMap()
+                toMutableMap.put(stockName, portfolio.map.getValue(stockName) - quantity)
 
-    }
+                Tuple2(Portfolio(toMutableMap), revenues)
 
-    override fun get(stockName: String ): Transaction = {
-        portfolio ->
-        TransactionResult(portfolio.map.getValue(stockName),portfolio)
-    }
+            }
 
+    override fun get(stockName: String): State<Portfolio, Int> =
+            State { portfolio ->  Tuple2(portfolio, portfolio.map.getValue(stockName)) }
 }

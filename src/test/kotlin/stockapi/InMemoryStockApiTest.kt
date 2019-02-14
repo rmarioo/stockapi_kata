@@ -1,67 +1,50 @@
 package stockapi
 
 import arrow.data.fix
+import arrow.data.run
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
 
 class StockApiTest {
 
-
     @Test
-    fun `sell stocks v1`() {
+    fun `sell stocks monad`() {
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
-        val portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100))
-        val transactionResult = stockApi.sell(  stockName = "GE",
-                                                quantity  = 10)(portfolio)
+        val program = stockApi.sell(  stockName = "GE", quantity  = 10)
 
-        assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 40, "FIAT" to 100))))
-        assertThat(transactionResult.amount, `is`(10*10))
+        val (portfolioResult, amount) = program.fix().run(Portfolio(mapOf("GE" to 50, "FIAT" to 100)))
+
+        assertThat(portfolioResult, `is`(Portfolio(mapOf("GE" to 40, "FIAT" to 100))))
+        assertThat(amount, `is`(10*10))
     }
 
-
     @Test
-    fun `buy stocks v1`() {
+    fun `buy stocks monad`() {
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
-        val portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100))
-        val transactionResult = stockApi.buy(
-                stockName  = "GE",
-                amount = 50)(portfolio)
+        val program = stockApi.buy(stockName  = "GE", amount = 50)
 
-        assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 50+(50/10), "FIAT"  to 100))))
-        assertThat(transactionResult.amount, `is`(50/10))
+        val (portfolioResult, amount) = program.fix().run(Portfolio(mapOf("GE" to 50, "FIAT" to 100)))
+
+        assertThat(portfolioResult, `is`(Portfolio(mapOf("GE" to 50+(50/10), "FIAT"  to 100))))
+        assertThat(amount, `is`(50/10))
     }
 
-
-  @Test
-    fun `transfer stocks v1`() {
+    @Test
+    fun `transfer stocks monad`() {
 
 
         val stockApi: StockApi = InMemoryStockApi(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
 
-        val portfolio = Portfolio(mapOf("GE" to 50, "FIAT" to 100))
-        val transactionResult = stockApi.transfer(
-                fromName  = "GE",
-                toName    = "FIAT")(portfolio)
+        val program = stockApi.transfer(fromName  = "GE",toName    = "FIAT")
 
-        assertThat(transactionResult.portfolio, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
-        assertThat(transactionResult.amount, `is`(250))
-    }
+        val (portfolioResult, amount) = program.fix().run(Portfolio(mapOf("GE" to 50, "FIAT" to 100)))
 
-    @Test
-    fun `transfer stocks  monad`() {
-
-
-        val stockApi: StockApiMonad = InMemoryStockApiMonad(mapOf("GE" to 10, "FIAT" to 2, "LMN" to 20))
-
-        val program = stockApi.transfer(fromName = "GE", toName = "FIAT")
-
-        val portfolio: Portfolio = program.fix().run { Portfolio(mapOf("GE" to 50, "FIAT" to 100)) }
-
-        assertThat(portfolio, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
+        assertThat(portfolioResult, `is`(Portfolio(mapOf("GE" to 0, "FIAT" to 100 + 50 *10 /2 ))))
+        assertThat(amount, `is`(250))
     }
 }

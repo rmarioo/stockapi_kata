@@ -1,30 +1,23 @@
 package stockapi
 
-data class Portfolio(val map: Map<String, Int>)
+import arrow.data.State
+import arrow.instances.monad
 
-data class TransactionResult(val amount: Int, val portfolio: Portfolio)
-
-typealias Transaction = (Portfolio) -> TransactionResult
 
 interface StockApi
 {
-    fun get(stockName: String): Transaction
+    fun get(stockName: String): State<Portfolio,Int>
 
-    fun sell(stockName: String, quantity: Int): Transaction
+    fun sell(stockName: String, quantity: Int): State<Portfolio,Int>
 
-    fun buy(stockName: String, amount: Int): Transaction
+    fun buy(stockName: String, amount: Int): State<Portfolio,Int>
 
-    fun transfer(fromName: String, toName: String): Transaction =
+    fun transfer(fromName: String, toName: String) = State().monad<Portfolio>().binding {
 
-            get(fromName)
-                    .flatMap { sell(fromName, it) }
-                    .flatMap { buy(toName, it) }
-
-
-
-    infix fun Transaction.flatMap(f: (Int) -> (Transaction)): Transaction = { portfolio ->
-        val (amount, newPortfolio) = this(portfolio)
-        f(amount)(newPortfolio)
+        val actualQuantity = get(fromName).bind()
+        val revenues = sell(fromName, actualQuantity).bind()
+        val purchase = buy(toName, revenues).bind()
+        purchase
     }
 
 }
